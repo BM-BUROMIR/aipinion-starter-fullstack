@@ -1,0 +1,24 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "A", "RUF", "PT"]
+# E=pycodestyle, F=pyflakes, I=isort, N=naming, W=warnings,
+# UP=pyupgrade, B=bugbear, SIM=simplify,
+# A=builtins, RUF=ruff-specific, PT=pytest-style
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true

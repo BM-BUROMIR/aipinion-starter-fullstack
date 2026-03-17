@@ -1,0 +1,39 @@
+#!/bin/sh
+set -e
+
+echo "=== Pre-push: full quality check ==="
+
+# 1. Full lint + format check
+echo "[1/6] Lint + format..."
+npm run lint
+npm run format:check
+
+# 2. Build
+echo "[2/6] Build..."
+npm run build
+
+# 3. Frontend tests with coverage
+echo "[3/6] Frontend tests + coverage..."
+npm run test:coverage
+
+# 4. Python lint (ruff)
+if [ -d "backend" ]; then
+  echo "[4/6] Python lint (ruff)..."
+  (cd backend && python -m ruff check . && python -m ruff format --check .)
+else
+  echo "[4/6] No Python backend — skipping ruff"
+fi
+
+# 5. Python tests with coverage
+if [ -d "backend" ]; then
+  echo "[5/6] Python tests + coverage..."
+  (cd backend && python -m pytest --cov=app --cov-fail-under=100 -q --tb=short)
+else
+  echo "[5/6] No Python backend — skipping pytest"
+fi
+
+# 6. E2E tests
+echo "[6/6] E2E tests..."
+npm run test:e2e
+
+echo "=== All checks passed ==="

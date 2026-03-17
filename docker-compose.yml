@@ -1,0 +1,16 @@
+services:
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - DISABLE_AUTH=true
+    healthcheck:
+      test: ['CMD', 'curl', '-sf', 'http://localhost:3000/api/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s

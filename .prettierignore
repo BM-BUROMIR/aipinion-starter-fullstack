@@ -1,0 +1,11 @@
+dist/
+node_modules/
+coverage/
+test-results/
+playwright-report/
+*.min.js
+*.min.css
+__pycache__/
+.venv/
+.pytest_cache/
+backend/
