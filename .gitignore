@@ -38,3 +38,10 @@ playwright-report/
 coverage/
 
 .gh-account
+
+# Superpowers (plans, specs — local only)
+docs/superpowers/
+.superpowers/
+
+# Task runner worktrees
+.task-runner/

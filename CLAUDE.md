@@ -1,100 +1,65 @@
 # CLAUDE.md — aipinion-starter-fullstack
 
-## Project
+## Обзор
 
-Public starter template for full-stack applications using the aipinion.ru conventions.
-Stack: Vite + React 19 (TypeScript) + FastAPI (Python) + Tailwind CSS 4.
-Deployed via Coolify as a single Docker container (nginx + uvicorn).
+Стартер-шаблон для fullstack-приложений aipinion.ru. Единый Docker-контейнер (nginx + uvicorn).
 
-## Architecture
+## Tech Stack
+
+- **Frontend:** React 19 + Vite + TypeScript + Tailwind CSS 4 (`@tailwindcss/vite`)
+- **Backend:** FastAPI + Pydantic Settings
+- **Auth:** JWT RS256 JWKS (backend), cookie `auth_token` (frontend)
+- **Тесты:** Vitest + Testing Library, pytest, Playwright (E2E)
+- **Docker:** Multi-stage (node build → python + nginx), порт 3000
+
+## Структура проекта
 
 ```
-frontend/          React 19 + Vite + TypeScript + Tailwind CSS 4
-├── src/
-│   ├── api/       Fetch wrapper with credentials
-│   ├── auth/      AuthProvider, AuthCallback, LoginScreen
-│   ├── components/  AppShell (sidebar layout), ErrorBoundary
-│   ├── pages/     Dashboard (example page)
-│   ├── hooks/     use-auth custom hook
-│   └── types/     Shared TypeScript types
+frontend/          React 19 + Vite + TS + Tailwind 4
+├── src/{api, auth, components, pages, hooks, types}/
 ├── tests/unit/    Vitest + Testing Library
-└── tests/e2e/     Playwright browser tests
+└── tests/e2e/     Playwright
 
 backend/           FastAPI + Pydantic Settings
-├── app/
-│   ├── auth/      JWT middleware (JWKS validation)
-│   ├── health/    GET /api/health
-│   └── example/   CRUD routes (in-memory store)
+├── app/{auth, health, example}/
 └── tests/         pytest
 
-Docker:            Multi-stage (node build → python + nginx)
+entrypoint.sh      nginx + uvicorn в одном контейнере
 ```
 
-## Commands
+## Команды
 
 ```bash
 # Frontend
 cd frontend && npm install
-npm run dev              # Vite dev server (port 5173)
-npm run build            # TypeScript check + production build
-npm run lint             # ESLint
-npm run test:coverage    # Vitest with 100% coverage
+npm run dev              # Vite :5173
+npm run build            # TS check + build
+npm run lint
+npm run test:coverage    # Vitest 100%
 
 # Backend
 cd backend && pip install -r requirements.txt -r requirements-dev.txt
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-ruff check .             # Lint
-ruff format --check .    # Format check
-pytest --cov=app --cov-fail-under=100  # Tests with 100% coverage
-
-# Root (husky + lint-staged)
-npm install
-npm run format:check     # Prettier check
+ruff check . && ruff format --check .
+pytest --cov=app --cov-fail-under=100
 
 # Docker
-docker compose up --build  # Full app on port 3000
+docker compose up --build  # :3000
 ```
 
-## Quality Gates
+## Env vars
 
-Pre-commit (lint-staged):
+| Переменная     | Назначение                                      |
+| -------------- | ----------------------------------------------- |
+| `DISABLE_AUTH` | `true` — отключить JWT для локальной разработки |
 
-- ESLint --fix + Prettier --write for frontend/\*.{ts,tsx}
-- Prettier --write for \*.{json,md,css,html}
-- Ruff check --fix + format for backend/\*_/_.py
+## Зависимости
 
-Pre-push (full check):
+- **auth/** — JWT через JWKS; frontend читает cookie `auth_token`. Без auth: `DISABLE_AUTH=true`
 
-1. `npm run lint` + `npm run format:check`
-2. `npm run build`
-3. `npm run test:coverage` (Vitest, threshold 100%)
-4. `cd backend && ruff check . && ruff format --check .`
-5. `cd backend && pytest --cov=app --cov-fail-under=100`
-6. `npm run test:e2e` (Playwright)
+## Правила проекта
 
-Push rejected on any failure.
-
-## Auth
-
-Integrated with auth.aipinion.ru:
-
-- Frontend: reads `auth_token` cookie, decodes JWT for display
-- Backend: validates JWT signature via JWKS endpoint (RS256)
-- Set `DISABLE_AUTH=true` for local development
-
-## Deployment
-
-```bash
-scripts/coolify.sh info        # Show app status
-scripts/coolify.sh deploy      # Trigger redeployment
-scripts/coolify.sh sync-env    # Push .env.prod to Coolify
-scripts/coolify.sh push-test   # Push + wait + smoke test
-```
-
-## Do NOT
-
-- Push without passing all tests (`--no-verify` is forbidden)
-- Commit `.env`, `.env.prod`, `.coolify.env`
-- Lower coverage threshold below 100%
-- Add `any` in TypeScript (ESLint: error)
-- Delete tests or skip quality gates
+- **Tailwind CSS 4** через Vite plugin, не CLI
+- **entrypoint.sh** — nginx + uvicorn в одном контейнере
+- **In-memory store** в backend — пример, заменить на БД
+- Шаблон публичный — без секретов и prod-конфигов
