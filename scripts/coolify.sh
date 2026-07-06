@@ -24,6 +24,63 @@ HEALTH_URL="${HEALTH_URL:-}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
+# --- Canonical oxi-coolify bridge ---
+# Standard commands use the shared plugin wrapper when it is available. If the
+# plugin is not installed, or the command is project-local, the legacy code below
+# remains the source of truth for other developers and CI jobs.
+OXI_COOLIFY_PLUGIN_ROOT="${OXI_COOLIFY_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-$HOME/cc/oxi/oxi-skills/plugins/oxi-coolify}}"
+OXI_COOLIFY_WRAPPER="${OXI_COOLIFY_WRAPPER:-$OXI_COOLIFY_PLUGIN_ROOT/scripts/coolify.sh}"
+
+_coolify_command_name() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project-dir|--format)
+        shift
+        if [[ $# -gt 0 ]]; then shift; fi
+        ;;
+      --project-dir=*|--format=*|--json)
+        shift
+        ;;
+      -h|--help|help)
+        echo "help"
+        return 0
+        ;;
+      *)
+        echo "$1"
+        return 0
+        ;;
+    esac
+  done
+  echo "help"
+}
+
+_coolify_is_standard_command() {
+  case "$1" in
+    target|resolve|info|status|logs|deploy|create-app|delete-app|wait-deploy|wait-ready|smoke|probe|deploy-logs|history|last-deploy|check-env|sync-env|pull-env|del-env|delete-env|dedup-env|set-limits|set-domain|push-test)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+_try_canonical_coolify() {
+  local command
+  command="$(_coolify_command_name "$@")"
+  _coolify_is_standard_command "$command" || return 1
+  [[ -x "$OXI_COOLIFY_WRAPPER" ]] || return 1
+
+  if [[ -z "${OXI_COOLIFY_BIN:-}" && -x "$OXI_COOLIFY_PLUGIN_ROOT/scripts/oxi-coolify" ]]; then
+    export OXI_COOLIFY_BIN="$OXI_COOLIFY_PLUGIN_ROOT/scripts/oxi-coolify"
+  fi
+
+  exec "$OXI_COOLIFY_WRAPPER" --project-dir "$PROJECT_DIR" "$@"
+}
+
+_try_canonical_coolify "$@" || true
+
+
 # --- Load Coolify credentials ---
 COOLIFY_ENV="$PROJECT_DIR/.coolify.env"
 if [[ -f "$COOLIFY_ENV" ]]; then
