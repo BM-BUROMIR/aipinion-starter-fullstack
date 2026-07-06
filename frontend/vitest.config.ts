@@ -14,7 +14,16 @@ export default defineConfig({
         functions: 100,
         lines: 100,
       },
-      exclude: ['tests/**', '**/*.config.*', 'dist/**', '**/*.d.ts', '**/types/**', 'src/main.tsx'],
+      exclude: [
+        'tests/**',
+        '**/*.config.*',
+        'dist/**',
+        '**/*.d.ts',
+        '**/types/**',
+        'src/main.tsx',
+        '../.worktrees/**',
+        '../.task-runner/**',
+      ],
     },
   },
 });
