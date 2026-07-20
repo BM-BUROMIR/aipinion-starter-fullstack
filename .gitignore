@@ -45,3 +45,4 @@ docs/superpowers/
 
 # Task runner worktrees
 .task-runner/
+.worktrees/
