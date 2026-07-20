@@ -1,40 +1,40 @@
 {
   "name": "aipinion-starter-fullstack",
-  "private": true,
   "version": "1.0.0",
+  "private": true,
   "type": "module",
-  "engines": {
-    "node": ">=20"
-  },
   "scripts": {
     "dev": "cd frontend && npm run dev",
     "dev:backend": "cd backend && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload",
     "build": "cd frontend && npm run build",
     "lint": "cd frontend && npm run lint",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "test": "cd frontend && npm run test",
     "test:coverage": "cd frontend && npm run test:coverage",
     "test:e2e": "cd frontend && npm run test:e2e",
     "test:backend": "cd backend && python -m pytest --cov=app --cov-fail-under=100 -q --tb=short",
     "prepare": "husky"
   },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "oxfmt": "^0.59.0"
+  },
   "lint-staged": {
     "frontend/**/*.{ts,tsx}": [
       "frontend/node_modules/.bin/eslint --config frontend/eslint.config.js --fix",
-      "prettier --write"
+      "oxfmt --no-error-on-unmatched-pattern"
     ],
     "*.{json,md,css,html}": [
-      "prettier --write"
+      "oxfmt --no-error-on-unmatched-pattern"
     ],
     "backend/**/*.py": [
       "ruff check --fix",
       "ruff format"
     ]
   },
-  "devDependencies": {
-    "husky": "^9.1.7",
-    "lint-staged": "^16.4.0",
-    "prettier": "^3.8.1"
+  "engines": {
+    "node": ">=20"
   }
 }

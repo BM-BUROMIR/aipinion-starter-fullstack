@@ -28,7 +28,7 @@ A production-ready starter template for full-stack web applications following [a
 git clone https://github.com/BM-BUROMIR/aipinion-starter-fullstack.git
 cd aipinion-starter-fullstack
 
-# Root dependencies (husky, lint-staged, prettier)
+# Root dependencies (husky, lint-staged, oxfmt)
 npm install
 
 # Frontend

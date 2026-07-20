@@ -1,17 +1,14 @@
 {
   "name": "frontend",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
-  "engines": {
-    "node": ">=20"
-  },
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "lint": "eslint .",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -43,5 +40,8 @@
     "typescript-eslint": "^8.57.1",
     "vite": "^7.3.1",
     "vitest": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
